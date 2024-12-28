@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <title>{{ title | default("#УборкаМусора") }}</title>
+</head>
+<header>
+    <nav class="navbar navbar-expand-lg" style="background-color: #424242; height: 100px;">
+        <div class="container-fluid">
+            <a class="navbar-brand" style="color:aliceblue" href="/">#УборкаМусора</a>
+            {% if current_user.is_authenticated %}
+            <ul class="nav nav-pills nav-fill gap-2 p-1 small bg-primary rounded-5 shadow-sm select-role" id="pillNav2" role="tablist" style="--bs-nav-link-color: var(--bs-white); --bs-nav-pills-link-active-color: var(--bs-primary); --bs-nav-pills-link-active-bg: var(--bs-white);display: none;">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active rounded-5 select-vol" id="home-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="true">Я волонтер</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-5 select-zak" id="profile-tab2" data-bs-toggle="tab" type="button" role="tab" aria-selected="false">Я заявитель</button>
+                </li>
+            </ul>
+            <div>
+                <a class="btn btn-outline-success" href="/profile">Профиль</a>
+                <a class="btn btn-outline-danger" href="/logout">Выйти</a>
+            </div>
+            {% else %}
+                <div>
+                    <a class="btn btn-outline-primary" href="/top">Рейтинг</a>
+                    <a class="btn btn-outline-success" href="/login">Войти</a>
+                </div>
+            {% endif %}
+        </div>
+    </nav>
+</header>
+<body>
+<div style="position: absolute; width: 100%; display: none;"class="flash-div alert alert-{{ category }} alert-dismissible " role="alert">
+    <b class="flash-message"></b>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+<div class="conten">
+{% block content %}
+{% endblock %}
+</div>
+<script>
+    let select_role = document.getElementsByClassName("select-role")[0];
+    let select_vol = document.getElementsByClassName("select-vol")[0];
+    let select_zak = document.getElementsByClassName("select-zak")[0];
+    let container = document.getElementsByClassName("container")[0];
+    let zak_div = document.getElementsByClassName("zak-div")[0];
+    let vol_div = document.getElementsByClassName("volunteer-div")[0];
+    function set_cookie_vol (){
+        document.cookie = "role=vol";
+        zak_div.style.display = "none"
+        vol_div.style.display = "block"
+    }
+    function set_cookie_zak (){
+        document.cookie = "role=zak";
+        zak_div.style.display = "block"
+        vol_div.style.display = "none"
+
+    }
+    select_vol.addEventListener('click', set_cookie_vol);
+    select_zak.addEventListener('click', set_cookie_zak);
+    var contains = false;
+    var children = container.children;
+    for (var i = 0; i < children.length; i++){
+        if (children[i].classList.contains('volunteer-div')){
+            contains = true;
+        }
+    }
+    if(contains){
+        select_role.style.display = "flex";
+    } else {
+        select_role.style.display = "none";
+    }
+
+
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>

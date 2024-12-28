@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<style>
+    .container {
+    background-color:rgba(218, 213, 189, 0.541);
+    display: flex;
+    flex-flow: column wrap;
+    border-radius: 30px;
+    align-items: center;
+}
+</style>
+<meta charset="UTF-8">
+<div class="container" style="align-items: normal;">
+    <div class="volunteer-div">
+        <br>
+        <h1 style="text-align: center;">
+            Информация о волонтере
+        </h1>
+        <div class="row-div" style=" justify-content: space-between; padding: 20px;">
+            <div class="column-div" style="width:40%;">
+                <div class="container">
+                    <img style="max-width: 200px; max-height:200px; padding: 20px;" src="{{url_for('static', filename='img/avatar.png')}}">
+                    <br>
+                    <div class="container">
+                        Имя:
+                    </div>
+                    <br>
+                    <div class="container">
+                        Город:
+                    </div>
+                    <br>
+                    <div class="container">
+                        Выполненные заказы:
+                    </div>
+                    <br>
+                </div>
+
+            </div>
+            <div class="column-div" style="width:50%; height: 100%;">
+                <div class="container" style="height: 100%;">
+                    <h3 style="text-align: center;">Текущие заказы</h3>
+                </div>
+                <br>
+                <a href="/get_task" class="btn btn-lg" style="background-color: rgba(38, 93, 247, 0.473); border-radius: 30px;">Взяться за заказ</a>
+            </div>
+        </div>
+    </div>
+    <div class="zak-div" style="display: none;">
+        <br>
+        <h1 style="text-align: center;">
+            Информация о заказчике
+        </h1>
+        <div class="row-div" style=" justify-content: space-between; padding: 20px;">
+            <div class="column-div" style="width:40%;">
+                <div class="container">
+                    <img style="max-width: 200px; max-height:200px; padding: 20px;" src="{{url_for('static', filename='img/avatar.png')}}">
+                    <br>
+                    <div class="container">
+                        Имя:
+                    </div>
+                    <br>
+                    <div class="container">
+                        Город:
+                    </div>
+                    <br>
+                    <div class="container">
+                        Ваши выполненные заказы:
+                    </div>
+                    <br>
+                </div>
+
+            </div>
+            <div class="column-div" style="width:50%; height: 100%;">
+                <div class="container" style="height: 100%;">
+                    <h3 style="text-align: center;">Текущие заказы</h3>
+                </div>
+                <br>
+                <a href="/add_task"class="btn btn-lg"  style="background-color: rgba(38, 93, 247, 0.473); border-radius: 30px;">Добавить заказ</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
