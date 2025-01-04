@@ -1,9 +1,11 @@
 from asyncio import Task
+import json
 import os
 import sys
 from flask import Flask, flash, jsonify, redirect, render_template, request
 from flask_login import LoginManager, current_user, login_fresh, login_required, logout_user, login_user
-from sqlalchemy import func, or_
+import requests
+from sqlalchemy import desc, func, or_
 
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -24,12 +26,31 @@ def load_user(user_id):
 @app.route("/reg", methods=["GET", "POST"])
 def reg():
     return render_template("registration.html")
+@app.route("/login", methods=["GET"])
+def login():
+    return render_template("login.html")
 @app.route("/add_task")
 def add_task():
     return render_template("add_task.html")
 @app.route("/profile")
 def profile():
-    return render_template("profile.html")
+    db_sess = db_session.create_session()
+    volunteer_applications = db_sess.query(Tasks).filter(Tasks.volunteer_id==current_user.id).all()
+    vol_app = []
+    for elem in volunteer_applications:
+        vol_app.append(json.loads(requests.get(f"https://geocode-maps.yandex.ru/1.x/?apikey={api_key[:-1]}&geocode={elem.coord_2}, {elem.coord_1}&format=json").text)["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["metaDataProperty"]["GeocoderMetaData"]["Address"]["formatted"])
+    user_applications = db_sess.query(Tasks).filter(Tasks.user_id==current_user.id).all()
+    us_app = []
+    for elem in user_applications:
+        us_app.append(json.loads(requests.get(f"https://geocode-maps.yandex.ru/1.x/?apikey={api_key[:-1]}&geocode={elem.coord_2}, {elem.coord_1}&format=json").text)["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["metaDataProperty"]["GeocoderMetaData"]["Address"]["formatted"])
+    profile_info = {"vol_app":vol_app,
+                    "user_app":us_app,
+                    "name":current_user.login,
+                    "city":current_user.city,
+                    "count_order_placed":current_user.count_order_placed if current_user.count_order_placed is not None else 0,
+                    "count_order_completed":current_user.count_order_completed if current_user.count_order_completed is not None else 0
+    }
+    return render_template("profile.html", profile_info=profile_info)
 @app.route("/")
 def main():
     return render_template("main.html")
@@ -39,11 +60,47 @@ def logout():
     logout_user()
     return redirect("/")
 
+@app.route("/get_task")
+@login_required
+def get_task():
+    db_sess = db_session.create_session()
+    tasks = db_sess.query(Tasks, Users).filter(Tasks.ended==False, Tasks.user_id==Users.id, Tasks.volunteer_id == None).order_by(desc(Tasks.id)).all()
+    out_sp = []
+    for elem in tasks:
+        address = json.loads(requests.get(f"https://geocode-maps.yandex.ru/1.x/?apikey={api_key[:-1]}&geocode={elem[0].coord_2}, {elem[0].coord_1}&format=json").text)["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["metaDataProperty"]["GeocoderMetaData"]["Address"]["formatted"]
+        out_sp.append({"note" : elem[0].note if elem[0].note!="" else "Пользователь не предоставил описание",
+                       "name_user": elem[1].login, 
+                       "address": address,
+                       "created_on": elem[0].created_on.strftime("%Y-%m-%d %H:%M"),
+                       "coord_1": elem[0].coord_1,
+                       "coord_2": elem[0].coord_2,
+                       "id":elem[0].id})
+    out_sp_formatted = []
+    tmp = []
+    for elem in out_sp:
+        tmp.append(elem)
+        if len(tmp) == 4:
+            out_sp_formatted.append(tmp)
+            tmp = []
+    if len(tmp) != 4:
+        out_sp_formatted.append(tmp)
+    return render_template("find_tasks.html", sp=out_sp_formatted, id_of_user=current_user.id)
+
+
 
 # API
 
 
-
+@app.route("/api/get_task", methods=["POST"])
+def api_get_task():
+    user_id = request.args.get("user_id")
+    task_id = request.args.get("task_id")
+    db_sess = db_session.create_session()
+    task = db_sess.query(Tasks).filter(Tasks.id==int(task_id)).first()
+    task.volunteer_id = user_id
+    db_sess.commit()
+    db_sess.close()
+    return {"Status":"ok"}
 @app.route("/api/city", methods=["GET"])
 def city():
     db_sess = db_session.create_session()
@@ -81,6 +138,23 @@ def reg_vol():
     except Exception as exc:
         print(exc)
         return jsonify({"Status": "err", "Error": "Something went wrong"}), 200
+@app.route("/api/login", methods={"POST"})
+def api_login():
+    try:
+        db_sess = db_session.create_session()
+        username = request.args.get("username")
+        password = request.args.get("password")
+        user = db_sess.query(Users).filter(Users.login == username).all()
+        if len(user) == 0:
+            return {"Status":"err", "Error":"username is not exists"}
+        if user[0].check_password(password) == True:
+            login_user(user[0], remember=True)
+            return {"Status": "ok"}, 200
+        else:
+            return {"Status": "err", "Error":"incorrect password"}, 200
+    except:
+        return {"Status":"err", "Error":"Something went wrong"}, 200
+
 @app.route("/api/add_task", methods=["POST"])
 def api_add_task():
     try:
@@ -90,6 +164,7 @@ def api_add_task():
         task.coord_2 = float(request.args.get("coord").split(",")[1])
         task.note = request.args.get("note")
         task.ended = False
+        task.user_id = current_user.id
         db_sess.add(task)
         db_sess.commit()
         db_sess.close()
@@ -97,5 +172,6 @@ def api_add_task():
     except:
         return {"Status":"err", "Error":"Something went wrong"}, 200
 if __name__ == '__main__':
+    api_key = open("api_key.txt", 'r').readline()
     db_session.global_init()
     app.run(port=5050)

@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/reg.css')}}"></head>
+    <div class="container">
+    <br>
+    <h1>Регистрация пользователя</h1>
+    <div id="myForm">
+        <b for="username">Логин</b>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <b for="password">Пароль</b>
+        <input type="password" id="password" name="password"required>
+        <br>
+        <button style="margin:10px auto auto auto; width: 100%;" class="btn btn-danger submit">Войти</button>
+        <br>
+    </div>
+    <script>
+let usernameInput = document.getElementById("username")
+let passwordInput = document.getElementById("password")
+let flash_div = document.getElementsByClassName("flash-div")[0]
+let flash_message = document.getElementsByClassName("flash-message")[0]
+async function login_volunteer() {
+    const username = usernameInput.value;
+    const password = passwordInput.value;
+    const url = `http://127.0.0.1:5050/api/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
+    try {
+        const res = await fetch(url, { method: 'POST'});
+
+        if (!res.ok) {
+            throw new Error('Ошибка сети: ' + res.status);
+        }
+        const data = await res.json();
+        if (data["Status"] == "ok"){
+            flash_div.className = "flash-div alert alert-success alert-dismissible";
+            flash_div.style.display = "block";
+            flash_message.textContent = "Успешный вход! Сейчас вы будете перенаправлены на главную страницу сайта";
+            await new Promise(r => setTimeout(r, 2000));
+            window.location.replace("http://127.0.0.1:5050/");
+        } else {
+            if (data['Error'] == "username is not exists"){
+                flash_div.className = "flash-div alert alert-danger alert-dismissible";
+                flash_div.style.display = "block";
+                flash_message.textContent = "Пользователя с таким логином не существует";
+            } else if (data["Error"] == "incorrect password"){
+                flash_div.className = "flash-div alert alert-danger alert-dismissible";
+                flash_div.style.display = "block";
+                flash_message.textContent = "Пароль не подходит";
+            } else if (data["Error"] == "Something went wrong"){
+                flash_div.className = "flash-div alert alert-danger alert-dismissible";
+                flash_div.style.display = "block";
+                flash_message.textContent = "Что-то пошло не так. Попробуйте позже";
+            } 
+
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+    }
+}
+button_submit = document.getElementsByClassName("submit")[0];
+button_submit.addEventListener("click", login_volunteer)
+
+
+    </script>
+</div>
+<br>
+
+{% endblock %}

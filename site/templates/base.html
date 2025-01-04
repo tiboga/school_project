@@ -59,8 +59,27 @@
         document.cookie = "role=zak";
         zak_div.style.display = "block"
         vol_div.style.display = "none"
-
     }
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; `);
+    for (let i = 0;i<parts.length;i++){
+        if (parts[i].startsWith("role")){
+            if (parts[i].slice(5) === "zak"){
+                    zak_div.style.display = "block"
+                    vol_div.style.display = "none"
+                    select_vol.classList.remove("active")
+                    select_zak.classList.remove("active")
+                    select_zak.classList.add("active")
+                } else {
+                    zak_div.style.display = "none"
+                    vol_div.style.display = "block"
+                    select_vol.classList.remove("active")
+                    select_zak.classList.remove("active")
+                    select_vol.classList.add("active")
+                }
+        }
+    }
+    
     select_vol.addEventListener('click', set_cookie_vol);
     select_zak.addEventListener('click', set_cookie_zak);
     var contains = false;

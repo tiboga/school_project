@@ -27,7 +27,7 @@
 
 <div class="container" >
     <br>
-    <h1>Добавить заказ</h1>
+    <h1>Добавить заявка</h1>
     <div id="map" style="width: 1000px; height: 400px; padding: 20px"></div>
     <br>
     <b for="note">Примечания</b>
@@ -75,7 +75,6 @@
         window.coord = point.geometry.getCoordinates();
         point.events.add("drag", function (e) {
             window.coord = e.get('target').geometry.getCoordinates();
-            console.log(window.coord);
         })
     }
     submit = document.getElementsByClassName("submit")[0]

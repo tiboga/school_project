@@ -6,68 +6,42 @@
         font-size: 30px; /* Размер цифр */
     }
 </style>
-<p></p>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<div style="padding: 20px; background-color: rgba(190, 255, 160, 0.664); border-radius: 30px; justify-content: space-between; display: flex; margin: 20px">
-<h1 style="text-align: center; font-size: 100px;">Убери мусор в своем городе!</h1>
+<div style="padding: 20px; background-color: rgba(190, 255, 160, 0.664); border-radius: 30px; justify-content: space-between; display: flex; margin-top: 15%; margin-bottom: 25%;">
+<h1 style="text-align: center; font-size: 100px;">Сделай свой город чище!</h1>
 </div>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<div style="padding: 20px; background-color: rgba(190, 255, 160, 0.664); border-radius: 30px; justify-content: space-between; display: flex; margin: 20px">
-    <div style="flex-flow: column wrap; width: 40%">
-        <h1>Всего несколько шагов и твой город станет чистым</h1>
-        <ol>
-            <li><h2>Видишь мусор</h2></li>
-            <li><h2>Запоминаешь адрес</h2></li>
-            <li><h2>Заходишь на сайт</h2></li>
-            <li><h2>Оставляешь заявку</h2></li>
-            <li><h2>Волонтеры убирают мусор</h2></li>
-            <li><h2>Наслаждаешься чистотой родного города</h2></li>
-        </ol>
-    </div>
-    <img style="max-width:700px; max-height:500px" src="{{url_for('static', filename='img/map.png')}}">
-</div>
-<br>
-<div style="width: 98%; padding: 20px; background-color: rgba(190, 255, 160, 0.664); border-radius: 30px; justify-content: space-between; display: flex; margin: 20px">
-    
-    <div class="column-div">
-        <div class="row-div">
-            <div style="flex-flow: column wrap; width: 50%; text-align: center;">
-                <h3>Хочешь стать волонтером и помочь людям?</h3>
-            </div>
-            <div class="vr" style="width: 2px;"></div>
-            <div style="flex-flow: column wrap; width: 50%; text-align: center;">
-                <h3>Хочешь оставить заявку на уборку?</h3>
-            </div>
+<div style="background-color: rgb(107, 168, 78); width: 100%">
+    <div style="margin-left: 5%; padding: 20px; background-color: rgba(190, 255, 160, 0.664); border-radius: 30px; justify-content: space-between; display: flex; margin-top: 15%; width: 90%;">
+        <div style="flex-flow: column wrap; width: 40%">
+            <h1>Всего несколько шагов и твой город станет чистым</h1>
+            <ol>
+                <li><h2>Видишь мусор</h2></li>
+                <li><h2>Запоминаешь адрес</h2></li>
+                <li><h2>Заходишь на сайт</h2></li>
+                <li><h2>Оставляешь заявку</h2></li>
+                <li><h2>Волонтеры убирают мусор</h2></li>
+                <li><h2>Наслаждаешься чистотой родного города</h2></li>
+            </ol>
         </div>
-        <div>
-            <div class="column-div">
-                <h1 style="text-align: center;">Все это доступно из одного профиля!</h1>
-                <div style="text-align: center;">
-                    <a style="width: 50%;" href="/reg" class="btn btn-info btn-lg">Зарегистрироваться</a>
+        <img style="width: 40%" src="{{url_for('static', filename='img/map.png')}}">
+    </div>
+    <div style="margin-top: 10%; margin-bottom: 20%; margin-left: 5% ;width: 90%; padding: 20px; background-color: rgba(190, 255, 160, 0.664); border-radius: 30px; justify-content: space-between; display: flex;">
+        
+        <div class="column-div">
+            <div class="row-div">
+                <div style="flex-flow: column wrap; width: 50%; text-align: center;">
+                    <h3>Хочешь стать волонтером и помочь людям?</h3>
+                </div>
+                <div class="vr" style="width: 2px;"></div>
+                <div style="flex-flow: column wrap; width: 50%; text-align: center;">
+                    <h3>Хочешь оставить заявку на уборку?</h3>
+                </div>
+            </div>
+            <div>
+                <div class="column-div">
+                    <h1 style="text-align: center;">Все это доступно из одного профиля!</h1>
+                    <div style="text-align: center;">
+                        <a style="width: 50%;" href="/reg" class="btn btn-info btn-lg">Зарегистрироваться</a>
+                    </div>
                 </div>
             </div>
         </div>

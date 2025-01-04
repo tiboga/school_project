@@ -21,36 +21,38 @@
         <div class="row-div" style=" justify-content: space-between; padding: 20px;">
             <div class="column-div" style="width:40%;">
                 <div class="container">
-                    <img style="max-width: 200px; max-height:200px; padding: 20px;" src="{{url_for('static', filename='img/avatar.png')}}">
+                    <img style="max-width: 200px; max-height:200px; padding: 20px; " src="{{url_for('static', filename='img/avatar.png')}}">
                     <br>
                     <div class="container">
-                        Имя:
+                        Имя: {{profile_info.name}}
                     </div>
                     <br>
                     <div class="container">
-                        Город:
+                        Город: {{profile_info.city}}
                     </div>
                     <br>
-                    <div class="container">
-                        Выполненные заказы:
+                    <div class="container" style="margin-bottom: 4%;">
+                        Выполненные заявки: {{profile_info.count_order_completed}}
                     </div>
-                    <br>
                 </div>
-
             </div>
             <div class="column-div" style="width:50%; height: 100%;">
-                <div class="container" style="height: 100%;">
-                    <h3 style="text-align: center;">Текущие заказы</h3>
+                <div class="container" style="height: 100%; margin-bottom: 3%; border-radius: 20px;  padding: 5px; ">
+                    <h3 style="text-align: center; ">Текущие заявки</h3>
                 </div>
-                <br>
-                <a href="/get_task" class="btn btn-lg" style="background-color: rgba(38, 93, 247, 0.473); border-radius: 30px;">Взяться за заказ</a>
+                {%for elem in profile_info.vol_app%}
+                    <button class="container" style="border-color: rgba(0, 0, 0, 0.5); height: 100%; margin-bottom: 3%; border-radius: 20px;">
+                        <h5 style="text-align: center;">{{elem}}</h5>
+                    </button>
+                {%endfor%}
+                <a href="/get_task" class="btn btn-lg" style="background-color: rgba(38, 93, 247, 0.473); border-radius: 20px; padding:20px;">Взяться за заявку</a>
             </div>
         </div>
     </div>
     <div class="zak-div" style="display: none;">
         <br>
         <h1 style="text-align: center;">
-            Информация о заказчике
+            Информация о заявителe
         </h1>
         <div class="row-div" style=" justify-content: space-between; padding: 20px;">
             <div class="column-div" style="width:40%;">
@@ -58,26 +60,28 @@
                     <img style="max-width: 200px; max-height:200px; padding: 20px;" src="{{url_for('static', filename='img/avatar.png')}}">
                     <br>
                     <div class="container">
-                        Имя:
+                        Имя: {{profile_info.name}}
                     </div>
                     <br>
                     <div class="container">
-                        Город:
+                        Город: {{profile_info.city}}
                     </div>
                     <br>
-                    <div class="container">
-                        Ваши выполненные заказы:
+                    <div class="container" style="margin-bottom: 4%;">
+                        Ваши выполненные заявки: {{profile_info.count_order_placed  }}
                     </div>
-                    <br>
                 </div>
-
             </div>
-            <div class="column-div" style="width:50%; height: 100%;">
-                <div class="container" style="height: 100%;">
-                    <h3 style="text-align: center;">Текущие заказы</h3>
+            <div class="column-div" style="width:50%; height: 100%">
+                <div class="container" style="height: 100%; padding: 5px; margin-bottom: 3%;  border-radius: 20px;">
+                    <h3 style="text-align: center;">Невыполненные заявки</h3>
                 </div>
-                <br>
-                <a href="/add_task"class="btn btn-lg"  style="background-color: rgba(38, 93, 247, 0.473); border-radius: 30px;">Добавить заказ</a>
+                {%for elem in profile_info.user_app%}
+                    <button class="container" style="border-color: rgba(0, 0, 0, 0.5); height: 100%; margin-bottom: 3%; border-radius: 20px;">
+                        <h5 style="text-align: center;">{{elem}}</h5>
+                    </button>
+                {%endfor%}
+                <a href="/add_task"class="btn btn-lg"  style="background-color: rgba(38, 93, 247, 0.473); border-radius: 20px; padding:20px;">Добавить заявку</a>
             </div>
         </div>
     </div>

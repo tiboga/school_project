@@ -8,7 +8,7 @@ import sqlalchemy.orm as orm
 from sqlalchemy.orm import Session
 import sqlalchemy.ext.declarative as dec
 
-SqlAlchemyBase = dec.declarative_base()
+SqlAlchemyBase = orm.declarative_base()
 
 __factory = None
 
@@ -23,7 +23,7 @@ def global_init():
                         username="tibo",
                         host="127.0.0.1",
                         database="school_project",
-                        password='1111'
+                        password='1d4a5f3s'
                     )
 
     engine = sa.create_engine(conn_str, echo=False)

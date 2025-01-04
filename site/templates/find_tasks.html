@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=216f2281-a0bc-4411-ac29-2723d14122fa&lang=ru_RU" type="text/javascript">
+    </script>
+    <style>
+        .container {
+        background-color:rgba(218, 213, 189, 0.541);
+        display: flex;
+        flex-flow: column wrap;
+        border-radius: 30px;
+        align-items: center;
+    }
+    input {
+        width: 100%;
+        border-radius: 7px;
+        border-left-color :black;
+        border-right-color :black;
+        border-bottom-color :black;
+        border-top-color :black;
+        background-color: rgba(255, 255, 255, 0.589) !important;
+    }   
+    </style>
+</head>
+<div class="conten" style="margin-top: -20px; padding-bottom: 10%;">
+    <div class="container" style="margin-bottom: 25%;">
+        <h1 style="padding-top: 20px;">Заявки</h1>
+        <div class="column-div" style="margin-bottom: 5%;">
+            {%for elem in sp%}
+                <div class="row-div" style="padding: 10px;">
+                    {% for e in elem %}
+                        <div class="card" style="width: 23%; height: 21rem; background-color: rgb(85, 148, 148); margin-left: 2%;">
+                            <div class="card-body">
+                                <h5 class="card-title" style="height: 10rem;">Заказ на: {{e.address}}</h5>
+                                <p class="card-text" style="height: 4rem;">{{e.note}}</p>
+                                <p class="d-inline-flex gap-1" style="width: 100%;">
+                                    <button style="width:100%" class="btn btn-success info" onclick="start_render_map(coords=[`{{e.coord_1}}`,`{{e.coord_2}}`], id='{{e.id}}')" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample{{e.id}}" aria-expanded="false" aria-controls="collapseExample">
+                                        <h4>Информация</h4>
+                                    </button>
+                                  </p>
+                                  <div class="collapse" id="collapseExample{{e.id}}">
+                                    <div class="card card-body" style="z-index: 100; height: 22rem;">
+                                        <div class="map" id="map-{{e.id}}" style="width: 100%; height: 70%;"></div>
+                                        <button class="btn btn-success" style="margin-top: 20%;" onclick="get_task(id=`{{e.id}}`)">Взяться за заявку</button>
+                                    </div>
+                                  </div>
+                            </div>
+                        </div>
+                    {%endfor%}        
+                </div>
+            {%endfor%}
+        </div>
+    </div>
+</div>
+<script>
+    var arr_id_maked_maps = [];
+    async function get_task(id_of_task){
+        let flash_div = document.getElementsByClassName("flash-div")[0];
+        let flash_message = document.getElementsByClassName("flash-message")[0];
+        const url = `http://127.0.0.1:5050/api/get_task?task_id=${id_of_task}&user_id={{id_of_user}}`;
+        try {
+                const res = await fetch(url, { method: 'POST'});
+                if (!res.ok) {
+                    throw new Error('Ошибка сети: ' + res.status);
+                }
+                const data = await res.json();
+                if (data["Status"] === "ok"){
+                    flash_div.className = "flash-div alert alert-success alert-dismissible";
+                    flash_div.style.display = "block";
+                    flash_message.textContent = "Вы приняли заявку - вы можете найти ее в своем профиле";
+                } else {
+                    flash_div.className = "flash-div alert alert-danger alert-dismissible";
+                    flash_div.style.display = "block";
+                    flash_message.textContent = "Что-то пошло не так. Попробуйте позже";
+                }
+                }
+        catch (error) {
+            console.error('Ошибка:', error);
+        }};
+    
+    function start_render_map(coords, id){
+        let sp_collapse = Array.from(document.getElementsByClassName("collapse"));
+        console.log(sp_collapse);
+        sp_collapse.forEach(element => {
+            if (element.classList.contains("show")){
+                element.classList = ["collapse"]
+            }
+        });
+        if (arr_id_maked_maps.includes(id)){
+            return;
+        } else {
+            arr_id_maked_maps.push(id);
+        }
+        let point = new ymaps.Placemark([coords[0], coords[1]],{}, {draggable:false});
+        let map = new ymaps.Map(`map-${id}`, {
+            center: [coords[0], coords[1]],
+            zoom: 7
+        });
+        map.geoObjects.add(point)
+        window.coord = point.geometry.getCoordinates();
+        point.events.add("drag", function (e) {
+            window.coord = e.get('target').geometry.getCoordinates();
+        })
+    }
+    function init(){
+
+    }
+</script>
+{% endblock %}
