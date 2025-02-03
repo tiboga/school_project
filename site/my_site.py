@@ -1,5 +1,6 @@
 from asyncio import Task
 import json
+import logging
 import os
 import sys
 from flask import Flask, flash, jsonify, redirect, render_template, request
@@ -14,6 +15,10 @@ from db.db_models.tasks import Tasks
 from db.db_models import cities, db_session
 from db.db_models.users import Users
 app = Flask(__name__)
+logging.basicConfig(
+    format='%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]',
+    level=logging.INFO
+)
 app.config['SECRET_KEY'] = 'flask_project_secret_key'
 login_manager = LoginManager(app)
 login_manager.login_message = "Авторизация успешно выполнена"
@@ -32,17 +37,37 @@ def login():
 @app.route("/add_task")
 def add_task():
     return render_template("add_task.html")
+
+
+
 @app.route("/profile")
 def profile():
     db_sess = db_session.create_session()
     volunteer_applications = db_sess.query(Tasks).filter(Tasks.volunteer_id==current_user.id).all()
     vol_app = []
     for elem in volunteer_applications:
-        vol_app.append(json.loads(requests.get(f"https://geocode-maps.yandex.ru/1.x/?apikey={api_key[:-1]}&geocode={elem.coord_2}, {elem.coord_1}&format=json").text)["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["metaDataProperty"]["GeocoderMetaData"]["Address"]["formatted"])
+        vol_app.append({"address":
+                        json.loads(
+                            requests.get(
+                                f"https://geocode-maps.yandex.ru/1.x/?apikey={api_key[:-1]}&geocode={elem.coord_2}, {elem.coord_1}&format=json").text)["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["metaDataProperty"]["GeocoderMetaData"]["Address"]["formatted"],
+                        "coord_1": elem.coord_1,
+                        "coord_2": elem.coord_2,
+                        "note": "Описания нет" if elem.note == "" else elem.note,
+                        })
     user_applications = db_sess.query(Tasks).filter(Tasks.user_id==current_user.id).all()
     us_app = []
     for elem in user_applications:
-        us_app.append(json.loads(requests.get(f"https://geocode-maps.yandex.ru/1.x/?apikey={api_key[:-1]}&geocode={elem.coord_2}, {elem.coord_1}&format=json").text)["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["metaDataProperty"]["GeocoderMetaData"]["Address"]["formatted"])
+        us_app.append(
+            {"address":
+             json.loads(
+                 requests.get(
+                     f"https://geocode-maps.yandex.ru/1.x/?apikey={api_key[:-1]}&geocode={elem.coord_2}, {elem.coord_1}&format=json").text)["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]["metaDataProperty"]["GeocoderMetaData"]["Address"]["formatted"],
+            "coord_1": elem.coord_1,
+            "coord_2": elem.coord_2,
+            "note": "Описания нет" if elem.note is None else elem.note,
+            "volunteer": "Пока никто не принял Вашу заявку" if elem.volunteer_id is None else db_sess.query(Users).filter(elem.volunteer_id==Users.id).first().login
+            })
+                     
     profile_info = {"vol_app":vol_app,
                     "user_app":us_app,
                     "name":current_user.login,
@@ -133,8 +158,9 @@ def reg_vol():
         login_user(user, remember=True)
         db_sess.add(user)
         db_sess.commit()
+        u_id = user.id
         db_sess.close()
-        return jsonify({"Status": "ok"}), 200
+        return jsonify({"Status": "ok", "id": u_id}), 200
     except Exception as exc:
         print(exc)
         return jsonify({"Status": "err", "Error": "Something went wrong"}), 200
@@ -149,7 +175,7 @@ def api_login():
             return {"Status":"err", "Error":"username is not exists"}
         if user[0].check_password(password) == True:
             login_user(user[0], remember=True)
-            return {"Status": "ok"}, 200
+            return {"Status": "ok", "id": user[0].id}, 200
         else:
             return {"Status": "err", "Error":"incorrect password"}, 200
     except:
@@ -174,4 +200,4 @@ def api_add_task():
 if __name__ == '__main__':
     api_key = open("api_key.txt", 'r').readline()
     db_session.global_init()
-    app.run(port=5050)
+    app.run(host='0.0.0.0', port=5050)

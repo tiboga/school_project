@@ -2,26 +2,68 @@
 
 {% block content %}
 <!DOCTYPE html>
-<style>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=216f2281-a0bc-4411-ac29-2723d14122fa&lang=ru_RU" type="text/javascript">
+    </script>
+    <style>
     .container {
     background-color:rgba(218, 213, 189, 0.541);
     display: flex;
     flex-flow: column wrap;
     border-radius: 30px;
     align-items: center;
+    h1, h3 {
+        text-align: center;
+    }
+    .row-div-extended {
+        justify-content: space-between;
+        padding: 20px;
+    }
+    .apps {
+        height: 100%;
+        margin-bottom: 3%;
+        border-radius: 20px;
+        padding: 5px;
+    }
+    .img-profile{
+        max-width: 200px; max-height:200px; padding: 20px;
+    }
+    .profile-info {
+        width:40%;
+    }
+    .apps-info {
+        width:50%; height: 100%
+    }
+    .map{
+        width: 400px; height: 200px;margin-left: auto; margin-right: auto; margin-bottom: 30px;
+    }
+    .btn-lg {
+        background-color: rgba(38, 93, 247, 0.473); border-radius: 20px; padding:20px;
+    }
+    .end-elem-info {
+        margin-bottom: 4%;
+    }
+    .accordion {
+        margin-bottom: 20px;
+    }
+    .main-container {
+        align-items: normal
+    }
 }
 </style>
-<meta charset="UTF-8">
-<div class="container" style="align-items: normal;">
-    <div class="volunteer-div">
+</head>
+<div class="container">
+    <div class="volunteer-div" style="display: block;  width: 100%;">
         <br>
-        <h1 style="text-align: center;">
+        <h1>
             Информация о волонтере
         </h1>
-        <div class="row-div" style=" justify-content: space-between; padding: 20px;">
-            <div class="column-div" style="width:40%;">
+        <div class="row-div row-div-extended">
+            <div class="column-div profile-info">
                 <div class="container">
-                    <img style="max-width: 200px; max-height:200px; padding: 20px; " src="{{url_for('static', filename='img/avatar.png')}}">
+                    <img class="img-profile" src="{{url_for('static', filename='img/avatar.png')}}">
                     <br>
                     <div class="container">
                         Имя: {{profile_info.name}}
@@ -31,33 +73,47 @@
                         Город: {{profile_info.city}}
                     </div>
                     <br>
-                    <div class="container" style="margin-bottom: 4%;">
+                    <div class="container end-elem-info">
                         Выполненные заявки: {{profile_info.count_order_completed}}
                     </div>
                 </div>
             </div>
-            <div class="column-div" style="width:50%; height: 100%;">
-                <div class="container" style="height: 100%; margin-bottom: 3%; border-radius: 20px;  padding: 5px; ">
-                    <h3 style="text-align: center; ">Текущие заявки</h3>
+            <div class="column-div apps-info">
+                <div class="container apps" >
+                    <h3 style="text-align: center;">Текущие заявки</h3>
                 </div>
-                {%for elem in profile_info.vol_app%}
-                    <button class="container" style="border-color: rgba(0, 0, 0, 0.5); height: 100%; margin-bottom: 3%; border-radius: 20px;">
-                        <h5 style="text-align: center;">{{elem}}</h5>
-                    </button>
-                {%endfor%}
-                <a href="/get_task" class="btn btn-lg" style="background-color: rgba(38, 93, 247, 0.473); border-radius: 20px; padding:20px;">Взяться за заявку</a>
+                <div class="accordion" id="accordionExample">
+                    {%for elem in profile_info.vol_app%}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{loop.index}}" aria-expanded="true" aria-controls="collapseOne">
+                                    {{elem.address}}
+                                </button>
+                            </h2>
+                            <div id="collapse{{loop.index}}" class="accordion-collapse collapse" data-bs-parent="#accordionExample" style="height: 300px;">
+                                <div class="accordion-body">
+                                    <p>
+                                        Описание: {{elem.note}}
+                                    </p>
+                                    <div class="map {{elem.coord_1}} {{elem.coord_2}}" id="map_{{loop.index}}_vol_app"></div>
+                                </div>
+                            </div>
+                        </div>
+                    {%endfor%}
+                </div>
+                <a href="/get_task" class="btn btn-lg">Взяться за заявку</a>
             </div>
         </div>
     </div>
-    <div class="zak-div" style="display: none;">
+    <div class="zak-div" style="display: none; width: 100%;">
         <br>
-        <h1 style="text-align: center;">
+        <h1>
             Информация о заявителe
         </h1>
-        <div class="row-div" style=" justify-content: space-between; padding: 20px;">
-            <div class="column-div" style="width:40%;">
+        <div class="row-div row-div-extended">
+            <div class="column-div profile-info">
                 <div class="container">
-                    <img style="max-width: 200px; max-height:200px; padding: 20px;" src="{{url_for('static', filename='img/avatar.png')}}">
+                    <img class="img-profile" src="{{url_for('static', filename='img/avatar.png')}}">
                     <br>
                     <div class="container">
                         Имя: {{profile_info.name}}
@@ -67,23 +123,57 @@
                         Город: {{profile_info.city}}
                     </div>
                     <br>
-                    <div class="container" style="margin-bottom: 4%;">
+                    <div class="container end-elem-info">
                         Ваши выполненные заявки: {{profile_info.count_order_placed  }}
                     </div>
                 </div>
             </div>
-            <div class="column-div" style="width:50%; height: 100%">
-                <div class="container" style="height: 100%; padding: 5px; margin-bottom: 3%;  border-radius: 20px;">
-                    <h3 style="text-align: center;">Невыполненные заявки</h3>
+            <div class="column-div apps-info">
+                <div class="container apps">
+                    <h3>Невыполненные заявки</h3>
                 </div>
-                {%for elem in profile_info.user_app%}
-                    <button class="container" style="border-color: rgba(0, 0, 0, 0.5); height: 100%; margin-bottom: 3%; border-radius: 20px;">
-                        <h5 style="text-align: center;">{{elem}}</h5>
-                    </button>
-                {%endfor%}
-                <a href="/add_task"class="btn btn-lg"  style="background-color: rgba(38, 93, 247, 0.473); border-radius: 20px; padding:20px;">Добавить заявку</a>
+                <div class="accordion" id="accordionExample">
+                    {%for elem in profile_info.user_app%}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{loop.index}}" aria-expanded="true" aria-controls="collapseOne">
+                                    {{elem.address}}
+                                </button>
+                            </h2>
+                            <div id="collapse{{loop.index}}" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    <p>
+                                        Описание: {{elem.note}}
+                                    </p>
+                                    <div class="map {{elem.coord_1}} {{elem.coord_2}}" id="map_{{loop.index}}_us_app"></div>
+                                    <p>
+                                        Волонтер: {{elem.volunteer}}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {%endfor%}
+                </div>
+                <a href="/add_task"class="btn btn-lg">Добавить заявку</a>
             </div>
         </div>
     </div>
 </div>
+<script>
+    ymaps.ready(init)
+    function init(){
+        const maps = Array.from(document.getElementsByClassName("map"));
+    maps.forEach(element => {
+        console.log(element.value);
+        const coords = element.classList;
+        var point = new ymaps.Placemark([coords[1], coords[2]],{}, {draggable:false});
+        var map = new ymaps.Map(element.id, {
+            center: [coords[1], coords[2]],
+            zoom: 7
+        });
+        map.geoObjects.add(point)
+    });
+    }
+    
+</script>
 {% endblock %}
