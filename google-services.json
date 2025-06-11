@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "792641387068",
+    "project_id": "chistiygorod-d6392",
+    "storage_bucket": "chistiygorod-d6392.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:792641387068:android:eed908ae6c289aad9d2139",
+        "android_client_info": {
+          "package_name": "com.example.finalproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDKCsFzZ_GChxnmCNuqBbx1I4GdwcIcn4M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
