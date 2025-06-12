@@ -629,14 +629,16 @@ def get_top_users(object_ordering, uid):
     try:
         uid = int(uid)
         db_sess = db_session.create_session()
-        users = db_sess.query(Users)
+        users_query = db_sess.query(Users)
+        
         if object_ordering == "balance":
-            users.order_by(Users.balance.desc())
+            users_query = users_query.order_by(Users.balance.desc())
         elif object_ordering == "count_placed":
-            users.order_by(Users.count_order_placed.desc())
+            users_query = users_query.order_by(Users.count_order_placed.desc())
         else:
-            users.order_by(Users.count_order_completed.desc())
-        users = users.all()
+            users_query = users_query.order_by(Users.count_order_completed.desc())
+            
+        users = users_query.all()
         out_sp = []
         counter = 1
         for user in users:
