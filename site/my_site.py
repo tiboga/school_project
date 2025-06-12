@@ -625,17 +625,17 @@ def add_task_to_confirmation(id):
 
 
 @app.route('/api/get_top_users/<object_ordering>/<uid>')
-def get_top_100_users_for_coins(object_ordering, uid):
+def get_top_users(object_ordering, uid):
     try:
         uid = int(uid)
         db_sess = db_session.create_session()
         users = db_sess.query(Users)
         if object_ordering == "balance":
-            users.order_by(Users.balance)
+            users.order_by(Users.balance.desc())
         elif object_ordering == "count_placed":
-            users.order_by(Users.count_order_placed)
+            users.order_by(Users.count_order_placed.desc())
         else:
-            users.order_by(Users.count_order_completed)
+            users.order_by(Users.count_order_completed.desc())
         users = users.all()
         out_sp = []
         counter = 1
