@@ -336,7 +336,7 @@ def reg_vol():
         db_sess.close()
         return jsonify({'Status': 'ok', 'id': u_id}), 200
     except Exception as exc:
-        print(exc)
+        print(str(exc))
         return jsonify({'Status': 'err', 'Error': 'Something went wrong'}), 200
 
 
@@ -624,20 +624,33 @@ def add_task_to_confirmation(id):
         return {'Status': 'err', 'Error': 'Something went wrong'}, 200
 
 
-@app.route('/api/get_top_100_users_for_coins/<uid>/')
-def get_top_100_users_for_coins(uid):
+@app.route('/api/get_top_users/<object_ordering>/<uid>')
+def get_top_100_users_for_coins(object_ordering, uid):
     try:
         uid = int(uid)
         db_sess = db_session.create_session()
-        users = db_sess.query(Users).order_by(Users.balance)
+        users = db_sess.query(Users)
+        if object_ordering == "balance":
+            users.order_by(Users.balance)
+        elif object_ordering == "count_placed":
+            users.order_by(Users.count_order_placed)
+        else:
+            users.order_by(Users.count_order_completed)
+        users = users.all()
         out_sp = []
+        counter = 1
         for user in users:
             out_sp.append(
                 {
+                    "index": str(counter),
                     "id": str(user.id),
+                    "name": str(user.login),
                     "balance": str(user.balance),
+                    "count_placed": str(user.count_order_placed),
+                    "count_completed": str(user.count_order_completed)
                 }
             )
+            counter += 1
         return {
                     "Status": "ok",
                     "users": out_sp
